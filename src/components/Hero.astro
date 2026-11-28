@@ -1,0 +1,41 @@
+---
+import { profile, techGroups, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import Button from './Button.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const stack = ['Java', 'Spring Boot', 'Node.js', 'FastAPI', 'Django'];
+const learning = techGroups.flatMap((g) => g.items).filter((i) => i.learning).map((i) => tr(i.name, lang)).slice(0, 3);
+const q = (s: string) => `"${s}"`;
+---
+<section id="inicio" class="hero" aria-labelledby="hero-title">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      {profile.available && <p class="status"><span class="dot" aria-hidden="true"></span>{tr(profile.availableText, lang)}</p>}
+      <p class="hero-name">{profile.name}</p>
+      <h1 id="hero-title">{profile.role}</h1>
+      <p class="hero-tag">{profile.tagline}</p>
+      <p class="hero-intro">{tr(profile.intro, lang)}</p>
+      <div class="actions">
+        <Button href="#proyectos" variant="primary">{t.viewProjects}</Button>
+        <Button href={tr(profile.cv, lang)} icon="download" download>{t.downloadCv}</Button>
+        <Button href={profile.github} icon="github" external>{t.visitProfile}</Button>
+        <a class="link" href="#contacto">{t.contactMe}</a>
+      </div>
+    </div>
+    <figure class="terminal" aria-label={t.apiAria}>
+      <div class="term-bar"><i></i><i></i><i></i><span>GET /api/profile</span></div>
+      <pre><code>
+<span class="ln" style="--i:0"><span class="c">$ curl api.jose-angel.dev/profile</span></span>
+<span class="ln" style="--i:1">{'{'}</span>
+<span class="ln" style="--i:2">  <span class="k">"name"</span>: <span class="s">{q(profile.name)}</span>,</span>
+<span class="ln" style="--i:3">  <span class="k">"role"</span>: <span class="s">{q(profile.role)}</span>,</span>
+<span class="ln" style="--i:4">  <span class="k">"stack"</span>: [{stack.map((s, i) => <><span class="s">{q(s)}</span>{i < stack.length - 1 ? ', ' : ''}</>)}],</span>
+<span class="ln" style="--i:5">  <span class="k">"learning"</span>: [{learning.map((s, i) => <><span class="s">{q(s)}</span>{i < learning.length - 1 ? ', ' : ''}</>)}],</span>
+<span class="ln" style="--i:6">  <span class="k">"location"</span>: <span class="s">{q(tr(profile.location, lang))}</span>,</span>
+<span class="ln" style="--i:7">  <span class="k">"status"</span>: <span class="s">{q(profile.available ? 'open_to_opportunities' : 'busy')}</span></span>
+<span class="ln" style="--i:8">{'}'}<span class="caret"></span></span></code></pre>
+    </figure>
+  </div>
+</section>

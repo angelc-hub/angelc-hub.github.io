@@ -1,0 +1,37 @@
+---
+import { profile, techGroups, education, softSkills, languages, projects, tr, type Lang } from '../data/portfolio';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const h = lang === 'es'
+  ? { summary: 'Perfil profesional', edu: 'Formación académica', stack: 'Stack tecnológico', proj: 'Proyectos (personales / demostrativos)', soft: 'Habilidades blandas', lang: 'Idiomas', print: 'Imprimir / Guardar como PDF', cap: ['Backend', 'Bases de datos', 'Data Science & AI', 'Herramientas'], ph: '[reemplazar por proyecto real]' }
+  : { summary: 'Professional summary', edu: 'Education', stack: 'Technical stack', proj: 'Projects (personal / demo)', soft: 'Soft skills', lang: 'Languages', print: 'Print / Save as PDF', cap: ['Backend', 'Databases', 'Data Science & AI', 'Tools'], ph: '[replace with a real project]' };
+const known = (i: number) => techGroups[i].items.map((x) => tr(x.name, lang)).join(', ');
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CV · {profile.name}</title><meta name="robots" content="noindex" />
+    <style>
+      @page { size: A4; margin: 14mm }
+      body { font: 10.5pt/1.4 Arial, Helvetica, sans-serif; color: #111; background: #fff; max-width: 190mm; margin: 0 auto; padding: 12mm }
+      h1 { font-size: 20pt; margin: 0 } h2 { font-size: 11pt; border-bottom: 1px solid #999; margin: 12pt 0 4pt; padding-bottom: 2pt }
+      p, ul { margin: 2pt 0 } ul { padding-left: 14pt } a { color: #111 } .sub { color: #444 }
+      .print { margin-bottom: 10pt } @media print { .print { display: none } body { padding: 0 } }
+    </style>
+  </head>
+  <body>
+    <p class="print"><button onclick="print()">{h.print}</button></p>
+    <h1>{profile.name}</h1>
+    <p class="sub">{profile.headline}</p>
+    <p>{tr(profile.location, lang)} · {profile.phone} · <a href={`mailto:${profile.email}`}>{profile.email}</a> · <a href={profile.github}>{profile.github}</a></p>
+    <h2>{h.summary}</h2><p>{tr(profile.summary, lang)}</p>
+    <h2>{h.edu}</h2><p><b>{education.institution}</b> — {tr(education.degree, lang)} ({tr(education.status, lang)}, {tr(education.term, lang)})</p>
+    <h2>{h.stack}</h2>
+    <ul>{h.cap.map((c, i) => <li><b>{c}:</b> {known(i)}</li>)}</ul>
+    <h2>{h.proj}</h2>
+    <ul>{projects.slice(0, 4).map((p) => <li><b>{tr(p.name, lang)}</b> — {p.tech.join(', ')}{p.placeholder && ` ${h.ph}`}</li>)}</ul>
+    <h2>{h.soft}</h2><p>{softSkills.filter((s) => s.score >= 4).map((s) => tr(s.name, lang)).join(', ')}</p>
+    <h2>{h.lang}</h2><p>{languages.map((l) => `${tr(l.name, lang)}: ${tr(l.level, lang)}`).join(' · ')}</p>
+  </body>
+</html>

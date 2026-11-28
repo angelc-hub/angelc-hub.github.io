@@ -1,0 +1,32 @@
+---
+import { projects, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import SectionHeading from './SectionHeading.astro';
+import Button from './Button.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<section class="section reveal" aria-labelledby="proyectos">
+  <div class="container">
+    <SectionHeading id="proyectos" title={t.projectsTitle} lead={t.projectsLead} />
+    <div class="projects">
+      {projects.map((p) => (
+        <article class="card project">
+          <pre class="preview" aria-hidden="true"><code>{p.preview.join('\n')}</code></pre>
+          <div class="project-body">
+            <p class="muted small">{tr(p.category, lang)}{p.placeholder && <em class="tag">{t.demoTag}</em>}</p>
+            <h3>{tr(p.name, lang)}</h3>
+            <p>{tr(p.description, lang)}</p>
+            <ul class="chips">{p.tech.map((x) => <li>{x}</li>)}</ul>
+            <div class="actions sm">
+              {p.repo ? <Button href={p.repo} icon="github" external>{t.code}</Button>
+                : <span class="btn btn-ghost disabled" aria-disabled="true"><span>{t.repoPending}</span></span>}
+              {p.demo && <Button href={p.demo} icon="external" external>{t.demo}</Button>}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

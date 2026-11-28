@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+interface Props { href?: string; variant?: 'primary' | 'ghost'; icon?: any; download?: boolean; external?: boolean; copy?: string; label?: string; class?: string }
+const { href, variant = 'ghost', icon, download, external, copy, label, class: cls = '' } = Astro.props;
+const ext = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+{copy ? (
+  <button type="button" class:list={['btn', `btn-${variant}`, cls]} data-copy={copy}>
+    {icon && <Icon name={icon} />}<span data-copy-label><slot /></span>
+  </button>
+) : (
+  <a class:list={['btn', `btn-${variant}`, cls]} href={href} download={download ? '' : undefined} aria-label={label} {...ext}>
+    {icon && <Icon name={icon} />}<slot />
+  </a>
+)}

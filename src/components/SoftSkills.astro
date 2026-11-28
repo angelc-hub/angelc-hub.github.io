@@ -1,0 +1,24 @@
+---
+import { softSkills, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import SectionHeading from './SectionHeading.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<section class="section reveal" aria-labelledby="habilidades">
+  <div class="container">
+    <SectionHeading id="habilidades" title={t.softTitle} lead={t.softLead} />
+    <ul class="soft">
+      {softSkills.map((s) => (
+        <li>
+          <span>{tr(s.name, lang)}</span>
+          <span class="bar" role="img" aria-label={`${s.score} ${t.outOf}`}>
+            {[1, 2, 3, 4, 5].map((n) => <i class:list={{ on: n <= s.score }}></i>)}
+          </span>
+          <span class="score">{s.score}/5</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

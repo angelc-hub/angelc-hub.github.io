@@ -1,0 +1,28 @@
+---
+import { nav, profile, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="#inicio" class="brand" aria-label={t.brandAria}><span class="brand-mark">&lt;/&gt;</span>{profile.shortName}</a>
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu" aria-label={t.menuOpen}>
+      <span class="i-open"><Icon name="menu" size={22} /></span><span class="i-close"><Icon name="close" size={22} /></span>
+    </button>
+    <nav id="menu" data-menu aria-label={t.mainNav}>
+      <ul>{nav.map((l) => <li><a href={l.href}>{tr(l.label, lang)}</a></li>)}</ul>
+      <div class="nav-actions">
+        <a class="lang-btn" href={t.otherHref} hreflang={t.langCode} lang={t.langCode} aria-label={t.langAria} title={t.langAria}>{t.langLabel}</a>
+        <button type="button" class="theme-btn" data-theme-toggle aria-label={t.themeAria} title={t.themeTitle}>
+          <span class="i-moon"><Icon name="moon" /></span><span class="i-sun"><Icon name="sun" /></span>
+        </button>
+        <Button href={profile.github} icon="github" external label={t.githubAria}>{t.github}</Button>
+        <Button href={tr(profile.cv, lang)} icon="download" variant="primary" download>{t.downloadCv}</Button>
+      </div>
+    </nav>
+  </div>
+</header>

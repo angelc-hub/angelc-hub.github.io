@@ -1,0 +1,35 @@
+---
+import { techGroups, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import SectionHeading from './SectionHeading.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<section class="section reveal" aria-labelledby="tecnologias">
+  <div class="container">
+    <SectionHeading id="tecnologias" title={t.techTitle} lead={t.techLead} />
+    <div class="tech-grid">
+      {techGroups.map((g) => (
+        <article class="panel">
+          <h3>{tr(g.title, lang)}</h3>
+          <p class="muted">{tr(g.description, lang)}</p>
+          <ul class="tech-list">
+            {g.items.map((i) => (
+              <li class="tech">
+                <span class="abbr" aria-hidden="true">{i.abbr}</span>
+                <span class="tech-main">
+                  <span class="tech-name">{tr(i.name, lang)}{i.learning && <em class="tag">{t.learning}</em>}</span>
+                  {i.note && <span class="muted small">{tr(i.note, lang)}</span>}
+                </span>
+                <span class="level" role="img" aria-label={`${t.levelWord}: ${t.levels[i.level]}`} title={t.levels[i.level]}>
+                  {[1, 2, 3, 4].map((n) => <i class:list={{ on: n <= i.level }}></i>)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

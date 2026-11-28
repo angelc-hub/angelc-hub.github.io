@@ -1,0 +1,16 @@
+---
+import { about, aboutFacts, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import SectionHeading from './SectionHeading.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section class="section reveal" aria-labelledby="sobre-mi">
+  <div class="container about">
+    <SectionHeading id="sobre-mi" title={ui[lang].aboutTitle} />
+    <div class="about-body">
+      {about.map((p) => <p>{tr(p, lang)}</p>)}
+      <dl class="facts">{aboutFacts.map((f) => <div><dt>{tr(f.label, lang)}</dt><dd>{tr(f.value, lang)}</dd></div>)}</dl>
+    </div>
+  </div>
+</section>

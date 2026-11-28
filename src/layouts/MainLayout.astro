@@ -1,0 +1,144 @@
+---
+import '../styles/global.css';
+import { profile, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const title = `${profile.name} | ${profile.role}`;
+const description = t.description;
+const site = Astro.site ?? new URL(profile.site);
+const urls = { es: new URL('/', site).href, en: new URL('/en/', site).href };
+const canonical = urls[lang];
+const og = new URL('/og.png', site).href;
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (function () {
+        var t; try { t = localStorage.getItem('theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+    <script is:inline>
+      (function () {
+        // Detección de idioma en la primera visita (solo Español / Inglés).
+        if (navigator.webdriver || /bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent)) return;
+        var saved; try { saved = localStorage.getItem('lang'); } catch (e) {}
+        var sys = ((navigator.languages && navigator.languages[0]) || navigator.language || 'es').toLowerCase();
+        var want = saved === 'es' || saved === 'en' ? saved : sys.indexOf('es') === 0 ? 'es' : 'en';
+        var onEn = /^\/en(\/|$)/.test(location.pathname);
+        if (want === 'en' && !onEn) location.replace('/en/' + location.search + location.hash);
+        else if (want === 'es' && onEn) location.replace('/' + location.search + location.hash);
+      })();
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={profile.name} />
+    <meta name="theme-color" content="#faf7f0" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={urls.es} />
+    <link rel="alternate" hreflang="en" href={urls.en} />
+    <link rel="alternate" hreflang="x-default" href={urls.es} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_PE'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'Person', name: profile.name, jobTitle: profile.role,
+      email: profile.email, url: profile.site, sameAs: [profile.github],
+      address: { '@type': 'PostalAddress', addressLocality: 'Puno', addressCountry: 'PE' },
+      alumniOf: 'Universidad Peruana Unión',
+    })} />
+  </head>
+  <body>
+    <a class="skip" href="#contenido">{t.skip}</a>
+    <slot />
+    <script>
+      document.documentElement.classList.add('js');
+      // Tema claro / oscuro
+      const root = document.documentElement;
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      const applyTheme = (t: string) => {
+        root.dataset.theme = t;
+        themeMeta?.setAttribute('content', t === 'dark' ? '#14161c' : '#faf7f0');
+      };
+      applyTheme(root.dataset.theme ?? 'light');
+      document.querySelectorAll('[data-theme-toggle]').forEach((b) => b.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.classList.add('theme-anim');
+        setTimeout(() => root.classList.remove('theme-anim'), 450);
+        applyTheme(next);
+        try { localStorage.setItem('theme', next); } catch {}
+      }));
+      // Si no hay tema elegido, seguir en vivo al sistema
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        let saved: string | null = null;
+        try { saved = localStorage.getItem('theme'); } catch {}
+        if (saved !== 'light' && saved !== 'dark') applyTheme(e.matches ? 'dark' : 'light');
+      });
+      // Sincronizar el tema entre pestañas abiertas
+      addEventListener('storage', (e) => {
+        if (e.key === 'theme' && (e.newValue === 'light' || e.newValue === 'dark')) applyTheme(e.newValue);
+      });
+      // Recordar el idioma que el visitante elige manualmente
+      document.querySelectorAll<HTMLAnchorElement>('.lang-btn').forEach((a) => a.addEventListener('click', () => {
+        try { localStorage.setItem('lang', a.getAttribute('hreflang') ?? ''); } catch {}
+      }));
+      // Menú móvil
+      const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+      const menu = document.querySelector<HTMLElement>('[data-menu]');
+      const setMenu = (open: boolean) => {
+        toggle?.setAttribute('aria-expanded', String(open));
+        menu?.classList.toggle('open', open);
+      };
+      toggle?.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
+      menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+      document.addEventListener('keydown', (e) => e.key === 'Escape' && setMenu(false));
+
+      // Copiar correo
+      const msg = document.documentElement.lang === 'en' ? { ok: 'Email copied', fail: 'Could not copy' } : { ok: 'Correo copiado', fail: 'No se pudo copiar' };
+      document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+        const label = btn.querySelector('[data-copy-label]');
+        const original = label?.textContent ?? '';
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(btn.dataset.copy ?? '');
+            if (label) label.textContent = msg.ok;
+          } catch {
+            if (label) label.textContent = msg.fail;
+          }
+          setTimeout(() => label && (label.textContent = original), 2000);
+        });
+      });
+
+      // Aparición de secciones
+      const items = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        }), { rootMargin: '0px 0px -8% 0px' });
+        items.forEach((el) => io.observe(el));
+      } else items.forEach((el) => el.classList.add('in'));
+
+      // Enlace activo en la navbar
+      const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-menu] a[href^="#"]')];
+      const spy = new IntersectionObserver((entries) => entries.forEach((e) => {
+        if (e.isIntersecting) links.forEach((l) => l.toggleAttribute('aria-current', l.hash === '#' + e.target.id));
+      }), { rootMargin: '-45% 0px -50% 0px' });
+      links.forEach((l) => { const s = document.querySelector(l.hash); if (s) spy.observe(s); });
+    </script>
+  </body>
+</html>

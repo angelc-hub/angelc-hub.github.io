@@ -1,0 +1,23 @@
+---
+import { education as e, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import SectionHeading from './SectionHeading.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section class="section reveal" aria-labelledby="formacion">
+  <div class="container">
+    <SectionHeading id="formacion" title={ui[lang].eduTitle} />
+    <ol class="timeline">
+      <li>
+        <span class="node" aria-hidden="true"></span>
+        <article class="panel">
+          <p class="muted small">{tr(e.term, lang)}<em class="tag live">{tr(e.status, lang)}</em></p>
+          <h3>{e.institution}</h3>
+          <p>{tr(e.degree, lang)}</p>
+          <ul class="chips">{e.focus.map((f) => <li>{tr(f, lang)}</li>)}</ul>
+        </article>
+      </li>
+    </ol>
+  </div>
+</section>

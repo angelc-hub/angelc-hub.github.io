@@ -1,0 +1,13 @@
+---
+import { interests, tr, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+import SectionHeading from './SectionHeading.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section class="section reveal" aria-labelledby="intereses">
+  <div class="container">
+    <SectionHeading id="intereses" title={ui[lang].interestsTitle} />
+    <ul class="chips big">{interests.map((i) => <li>{tr(i, lang)}</li>)}</ul>
+  </div>
+</section>

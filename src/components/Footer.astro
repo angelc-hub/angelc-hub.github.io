@@ -1,0 +1,13 @@
+---
+import { profile, type Lang } from '../data/portfolio';
+import { ui } from '../data/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<footer class="footer">
+  <div class="container">
+    <p>© {new Date().getFullYear()} {profile.name}</p>
+    <p><a href={profile.github} target="_blank" rel="noopener noreferrer">{profile.githubUser}</a> · <a href={t.printHref}>{t.printable}</a></p>
+  </div>
+</footer>
